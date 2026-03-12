@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroFinance | AI Investment Hub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        :root {
+            --neon-blue: #00f5d4;
+            --electric-purple: #9b5de5;
+            --magenta: #f15bb5;
+            --vivid-yellow: #fee440;
+            --deep-space: #0a0a1a;
+            --cosmic-gray: #1e1e2e;
+            --stardust: rgba(255, 255, 255, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--deep-space);
+            color: white;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: rgba(10, 10, 26, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 2rem 1rem;
+            border-right: 1px solid var(--cosmic-gray);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            padding-left: 0.5rem;
+        }
+        
+        .logo-icon {
+            font-size: 1.75rem;
+            color: var(--magenta);
+        }
+        
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .nav-item {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            background: rgba(155, 93, 229, 0.2);
+            border-left: 3px solid var(--electric-purple);
+        }
+        
+        .nav-item:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            padding: 2rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, var(--neon-blue), var(--vivid-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--electric-purple), var(--magenta));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(155, 93, 229, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+        }
+        
+        .btn-outline:hover {
+            background: var(--neon-blue);
+            color: var(--deep-space);
+        }
+        
+        /* Investment Overview */
+        .investment-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .investment-card {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .investment-card:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-5px);
+        }
+        
+        .investment-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .investment-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--neon-blue);
+        }
+        
+        .investment-card-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .investment-card-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .positive {
+            color: var(--neon-blue);
+        }
+        
+        .negative {
+            color: var(--magenta);
+        }
+        
+        /* Portfolio Charts */
+        .portfolio-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-container {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .chart-period {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .period-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .period-btn.active {
+            background: rgba(155, 93, 229, 0.3);
+            color: white;
+        }
+        
+        .period-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Investment Holdings */
+        .holdings-section {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .view-all {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .asset-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .asset-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        
+        .asset-name {
+            font-weight: 600;
+        }
+        
+        .asset-symbol {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        .asset-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .asset-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn:hover {
+            background: var(--electric-purple);
+            transform: translateY(-2px);
+        }
+        
+        /* AI Recommendations */
+        .recommendations-section {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .recommendation-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            background: rgba(155, 93, 229, 0.2);
+        }
+        
+        .recommendation-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        .recommendation-buy .recommendation-icon {
+            background: rgba(0, 245, 212, 0.1);
+            color: var(--neon-blue);
+        }
+        
+        .recommendation-sell .recommendation-icon {
+            background: rgba(241, 91, 181, 0.1);
+            color: var(--magenta);
+        }
+        
+        .recommendation-diversify .recommendation-icon {
+            background: rgba(254, 228, 64, 0.1);
+            color: var(--vivid-yellow);
+        }
+        
+        .recommendation-content {
+            flex: 1;
+        }
+        
+        .recommendation-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .recommendation-desc {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .recommendation-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        /* AI Assistant */
+        .ai-assistant {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--electric-purple), var(--magenta));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(155, 93, 229, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+        
+        .ai-assistant i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            .portfolio-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-grid">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <a href="index.html" class="logo">
+                <i class="fas fa-brain logo-icon"></i>
+                <span>NeuroFinance</span>
+            </a>
+            
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transactions</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Budgeting</span>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Investments</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-piggy-bank"></i>
+                    <span>Savings</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="header">
+                <h1>AI Investment Hub</h1>
+                <div class="header-controls">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>Add Investment</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-robot"></i>
+                        <span>AI Rebalance</span>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Investment Overview Cards -->
+            <section class="investment-overview">
+                <div class="investment-card">
+                    <div class="investment-card-header">
+                        <div class="investment-card-title">Portfolio Value</div>
+                        <i class="fas fa-coins" style="color: var(--vivid-yellow)"></i>
+                    </div>
+                    <div class="investment-card-value">$48,725.84</div>
+                    <div class="investment-card-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+5.2% (24h)</span>
+                    </div>
+                </div>
+                
+                <div class="investment-card">
+                    <div class="investment-card-header">
+                        <div class="investment-card-title">Today's Gain</div>
+                        <i class="fas fa-chart-line" style="color: var(--neon-blue)"></i>
+                    </div>
+                    <div class="investment-card-value">+$2,415.36</div>
+                    <div class="investment-card-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+1.8% from open</span>
+                    </div>
+                </div>
+                
+                <div class="investment-card">
+                    <div class="investment-card-header">
+                        <div class="investment-card-title">YTD Return</div>
+                        <i class="fas fa-calendar-alt" style="color: var(--electric-purple)"></i>
+                    </div>
+                    <div class="investment-card-value">+18.7%</div>
+                    <div class="investment-card-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+3.2% vs benchmark</span>
+                    </div>
+                </div>
+                
+                <div class="investment-card">
+                    <div class="investment-card-header">
+                        <div class="investment-card-title">Risk Level</div>
+                        <i class="fas fa-shield-alt" style="color: var(--magenta)"></i>
+                    </div>
+                    <div class="investment-card-value">Moderate</div>
+                    <div class="investment-card-change">
+                        <span>AI Score: 7.2/10</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Portfolio Charts -->
+            <section class="portfolio-section">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Portfolio Performance</div>
+                        <div class="chart-period">
+                            <button class="period-btn">1D</button>
+                            <button class="period-btn">1W</button>
+                            <button class="period-btn active">1M</button>
+                            <button class="period-btn">1Y</button>
+                            <button class="period-btn">All</button>
+                        </div>
+                    </div>
+                    <div id="performanceChart"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Asset Allocation</div>
+                        <div class="chart-period">
+                            <button class="period-btn active">Value</button>
+                            <button class="period-btn">Target</button>
+                        </div>
+                    </div>
+                    <div id="allocationChart"></div>
+                </div>
+            </section>
+            
+            <!-- Investment Holdings -->
+            <section class="holdings-section">
+                <div class="section-header">
+                    <div class="section-title">Your Holdings</div>
+                    <a href="#" class="view-all">
+                        <span>View All</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Asset</th>
+                            <th>Price</th>
+                            <th>24h Change</th>
+                            <th>Value</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="asset-info">
+                                    <div class="asset-icon" style="background: rgba(0, 245, 212, 0.1); color: var(--neon-blue);">
+                                        <i class="fab fa-apple"></i>
+                                    </div>
+                                    <div>
+                                        <div class="asset-name">Apple Inc.</div>
+                                        <div class="asset-symbol">AAPL</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>$189.37</td>
+                            <td class="asset-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+2.45%</span>
+                            </td>
+                            <td>$12,450.80</td>
+                            <td>
+                                <div class="asset-actions">
+                                    <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                                    <button class="action-btn"><i class="fas fa-exchange-alt"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="asset-info">
+                                    <div class="asset-icon" style="background: rgba(155, 93, 229, 0.1); color: var(--electric-purple);">
+                                        <i class="fab fa-google"></i>
+                                    </div>
+                                    <div>
+                                        <div class="asset-name">Alphabet Inc.</div>
+                                        <div class="asset-symbol">GOOGL</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>$138.25</td>
+                            <td class="asset-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+1.78%</span>
+                            </td>
+                            <td>$9,245.50</td>
+                            <td>
+                                <div class="asset-actions">
+                                    <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                                    <button class="action-btn"><i class="fas fa-exchange-alt"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="asset-info">
+                                    <div class="asset-icon" style="background: rgba(241, 91, 181, 0.1); color: var(--magenta);">
+                                        <i class="fab fa-bitcoin"></i>
+                                    </div>
+                                    <div>
+                                        <div class="asset-name">Bitcoin</div>
+                                        <div class="asset-symbol">BTC</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>$42,850.00</td>
+                            <td class="asset-change negative">
+                                <i class="fas fa-arrow-down"></i>
+                                <span>-1.23%</span>
+                            </td>
+                            <td>$8,570.00</td>
+                            <td>
+                                <div class="asset-actions">
+                                    <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                                    <button class="action-btn"><i class="fas fa-exchange-alt"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="asset-info">
+                                    <div class="asset-icon" style="background: rgba(254, 228, 64, 0.1); color: var(--vivid-yellow);">
+                                        <i class="fas fa-chart-pie"></i>
+                                    </div>
+                                    <div>
+                                        <div class="asset-name">S&P 500 ETF</div>
+                                        <div class="asset-symbol">VOO</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>$412.36</td>
+                            <td class="asset-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+0.89%</span>
+                            </td>
+                            <td>$6,598.76</td>
+                            <td>
+                                <div class="asset-actions">
+                                    <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                                    <button class="action-btn"><i class="fas fa-exchange-alt"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="asset-info">
+                                    <div class="asset-icon" style="background: rgba(0, 245, 212, 0.1); color: var(--neon-blue);">
+                                        <i class="fas fa-database"></i>
+                                    </div>
+                                    <div>
+                                        <div class="asset-name">AI Tech Fund</div>
+                                        <div class="asset-symbol">AITX</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>$28.45</td>
+                            <td class="asset-change positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>+3.67%</span>
+                            </td>
+                            <td>$5,690.00</td>
+                            <td>
+                                <div class="asset-actions">
+                                    <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                                    <button class="action-btn"><i class="fas fa-exchange-alt"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            
+            <!-- AI Recommendations -->
+            <section class="recommendations-section">
+                <div class="section-header">
+                    <div class="section-title">AI Investment Recommendations</div>
+                    <a href="#" class="view-all">
+                        <span>View All</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+                
+                <div class="recommendation-card recommendation-buy">
+                    <div class="recommendation-icon">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="recommendation-content">
+                        <div class="recommendation-title">Buy Opportunity: NVIDIA Corp (NVDA)</div>
+                        <div class="recommendation-desc">AI models predict 78% chance of 15% upside based on earnings momentum and sector trends</div>
+                    </div>
+                    <div class="recommendation-actions">
+                        <button class="action-btn"><i class="fas fa-info-circle"></i></button>
+                        <button class="action-btn"><i class="fas fa-check"></i></button>
+                    </div>
+                </div>
+                
+                <div class="recommendation-card recommendation-diversify">
+                    <div class="recommendation-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="recommendation-content">
+                        <div class="recommendation-title">Portfolio Diversification</div>
+                        <div class="recommendation-desc">Reduce tech concentration by adding healthcare (XLV) and utilities (XLU) ETFs</div>
+                    </div>
+                    <div class="recommendation-actions">
+                        <button class="action-btn"><i class="fas fa-info-circle"></i></button>
+                        <button class="action-btn"><i class="fas fa-check"></i></button>
+                    </div>
+                </div>
+                
+                <div class="recommendation-card recommendation-sell">
+                    <div class="recommendation-icon">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="recommendation-content">
+                        <div class="recommendation-title">Profit Taking: Bitcoin (BTC)</div>
+                        <div class="recommendation-desc">Consider selling 25% of position after 42% gain to rebalance crypto allocation</div>
+                    </div>
+                    <div class="recommendation-actions">
+                        <button class="action-btn"><i class="fas fa-info-circle"></i></button>
+                        <button class="action-btn"><i class="fas fa-check"></i></button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- AI Assistant -->
+    <div class="ai-assistant">
+        <i class="fas fa-robot"></i>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Performance Chart
+            var performanceOptions = {
+                series: [{
+                    name: 'Your Portfolio',
+                    data: [42000, 42500, 43200, 44100, 44500, 45200, 46000, 47200, 48000, 48725]
+                }, {
+                    name: 'S&P 500',
+                    data: [40000, 40500, 40800, 41200, 41500, 41800, 42200, 42500, 42800, 43200]
+                }],
+                chart: {
+                    height: 350,
+                    type: 'area',
+                    foreColor: '#fff',
+                    toolbar: {
+                        show: true,
+                        tools: {
+                            download: true,
+                            selection: false,
+                            zoom: false,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: false
+                        }
+                    },
+                    background: 'transparent'
+                },
+                colors: ['#00f5d4', '#9b5de5'],
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.3,
+                        stops: [0, 90, 100]
+                    }
+                },
+                xaxis: {
+                    categories: ['Jan 1', 'Jan 5', 'Jan 10', 'Jan 15', 'Jan 20', 'Jan 25', 'Jan 30', 'Feb 5', 'Feb 10', 'Today'],
+                    axisBorder: {
+                        show: true,
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    axisTicks: {
+                        show: true,
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return "$" + val.toLocaleString()
+                        }
+                    }
+                },
+                grid: {
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    strokeDashArray: 4
+                },
+                legend: {
+                    position: 'top',
+                    labels: {
+                        colors: ['#fff']
+                    }
+                }
+            };
+            
+            var performanceChart = new ApexCharts(document.querySelector("#performanceChart"), performanceOptions);
+            performanceChart.render();
+            
+            // Allocation Chart
+            var allocationOptions = {
+                series: [44, 55, 13, 43, 22],
+                labels: ['Tech Stocks', 'ETFs', 'Crypto', 'AI Funds', 'Bonds'],
+                chart: {
+                    type: 'donut',
+                    foreColor: '#fff',
+                    background: 'transparent'
+                },
+                colors: ['#00f5d4', '#9b5de5', '#f15bb5', '#fee440', '#ffffff'],
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }],
+                legend: {
+                    position: 'right',
+                    labels: {
+                        colors: ['#fff']
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Total',
+                                    color: '#fff',
+                                    formatter: function(w) {
+                                        return '$' + w.globals.seriesTotals.reduce((a, b) => a + b, 0).toLocaleString()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            var allocationChart = new ApexCharts(document.querySelector("#allocationChart"), allocationOptions);
+            allocationChart.render();
+            
+            // Period buttons functionality
+            const periodButtons = document.querySelectorAll('.period-btn');
+            periodButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const parent = this.closest('.chart-period');
+                    parent.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // In a real app, this would update the chart data
+                    console.log(`Showing data for: ${this.textContent}`);
+                });
+            });
+            
+            // AI Assistant interaction
+            const aiAssistant = document.querySelector('.ai-assistant');
+            aiAssistant.addEventListener('click', function() {
+                alert("Hello! I'm your NeuroFinance AI investment advisor. I can help you:\n\n- Analyze portfolio performance\n- Identify rebalancing opportunities\n- Explain market trends\n- Generate personalized investment strategies\n\nHow can I assist with your investments today?");
+            });
+            
+            // AI Rebalance button
+            const aiRebalanceBtn = document.querySelector('.btn-outline');
+            aiRebalanceBtn.addEventListener('click', function() {
+                alert("AI Portfolio Rebalance Recommendation:\n\n1. Reduce tech stocks from 44% to 38%\n2. Increase ETFs from 22% to 28%\n3. Maintain crypto at 13%\n4. Add 5% to emerging markets\n\nPredicted improvement: +2.3% annual return with reduced volatility\n\nApply this rebalance?");
+            });
+            
+            // Action buttons
+            const actionButtons = document.querySelectorAll('.action-btn');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.querySelector('i').className;
+                    const assetRow = this.closest('tr');
+                    const assetName = assetRow.querySelector('.asset-name').textContent;
+                    
+                    if (action.includes('chart-line')) {
+                        alert(`Showing detailed analysis for: ${assetName}`);
+                    } else if (action.includes('exchange-alt')) {
+                        alert(`Trade interface for: ${assetName}`);
+                    } else if (action.includes('info-circle')) {
+                        alert(`Detailed recommendation analysis`);
+                    } else if (action.includes('check')) {
+                        alert(`Executing recommended action`);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

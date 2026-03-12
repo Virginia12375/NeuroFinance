@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroFinance | AI-Powered Expense Tracking</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
+    <style>
+        :root {
+            --neon-blue: #00f5d4;
+            --electric-purple: #9b5de5;
+            --magenta: #f15bb5;
+            --vivid-yellow: #fee440;
+            --deep-space: #0a0a1a;
+            --cosmic-gray: #1e1e2e;
+            --stardust: rgba(255, 255, 255, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--deep-space);
+            color: white;
+            line-height: 1.7;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, var(--stardust) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, var(--stardust) 0%, transparent 20%);
+        }
+        
+        .glow {
+            text-shadow: 0 0 10px currentColor;
+        }
+        .neon-glow {
+            box-shadow: 0 0 15px currentColor;
+        }
+        
+        header {
+            background: rgba(10, 10, 26, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 1px solid var(--cosmic-gray);
+        }
+        
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-decoration: none;
+        }
+        
+        .logo-icon {
+            font-size: 2rem;
+            color: var(--magenta);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--neon-blue);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--neon-blue);
+        }
+        
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--electric-purple), var(--magenta));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(155, 93, 229, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+        }
+        
+        .btn-outline:hover {
+            background: var(--neon-blue);
+            color: var(--deep-space);
+        }
+        
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 0 5%;
+            padding-top: 8rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-content {
+            max-width: 600px;
+            z-index: 2;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+            background: linear-gradient(45deg, var(--neon-blue), var(--vivid-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .stat-item {
+            background: rgba(30, 30, 46, 0.5);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            border-left: 3px solid var(--neon-blue);
+        }
+        
+        .stat-item h3 {
+            font-size: 1.5rem;
+            color: var(--neon-blue);
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-item p {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin: 0;
+        }
+        
+        #finance-visualization {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 45%;
+            height: 70%;
+            max-width: 700px;
+            z-index: 1;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .loading-visualization {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: var(--neon-blue);
+            font-size: 1.2rem;
+            z-index: 10;
+        }
+        
+        .features {
+            padding: 6rem 5%;
+            background: var(--cosmic-gray);
+            position: relative;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, var(--magenta), var(--vivid-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .section-title p {
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--neon-blue);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .feature-card:nth-child(1) .feature-icon {
+            background: rgba(0, 245, 212, 0.1);
+            color: var(--neon-blue);
+        }
+        
+        .feature-card:nth-child(2) .feature-icon {
+            background: rgba(155, 93, 229, 0.1);
+            color: var(--electric-purple);
+        }
+        
+        .feature-card:nth-child(3) .feature-icon {
+            background: rgba(241, 91, 181, 0.1);
+            color: var(--magenta);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-card p {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        footer {
+            background: var(--deep-space);
+            padding: 4rem 5%;
+            border-top: 1px solid var(--cosmic-gray);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+        
+        .footer-column h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            color: var(--neon-blue);
+            position: relative;
+            display: inline-block;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 50%;
+            height: 2px;
+            background: var(--magenta);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column li {
+            margin-bottom: 0.8rem;
+        }
+        
+        .footer-column a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-column a:hover {
+            color: var(--neon-blue);
+            padding-left: 5px;
+        }
+        
+        .footer-social {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .footer-social a {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--cosmic-gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .footer-social a:hover {
+            transform: translateY(-3px);
+            background: linear-gradient(45deg, var(--electric-purple), var(--magenta));
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--cosmic-gray);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+        
+        .ai-bubble {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--electric-purple), var(--magenta));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(155, 93, 229, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .ai-bubble:hover {
+            transform: scale(1.1);
+        }
+        
+        .ai-bubble i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 26, 0.9);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        /* Auth Modal */
+        .auth-modal {
+            background: var(--cosmic-gray);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            padding: 2rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            position: relative;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+            border: 1px solid var(--stardust);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .modal-overlay.active .auth-modal {
+            transform: translateY(0);
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+        
+        .auth-header {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .auth-header h2 {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(45deg, var(--neon-blue), var(--electric-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .auth-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--stardust);
+        }
+        
+        .auth-tab {
+            padding: 1rem;
+            cursor: pointer;
+            position: relative;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-right: 1rem;
+}
+        
+        .auth-tab.active {
+            color: var(--neon-blue);
+        }
+        
+        .auth-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--neon-blue);
+        }
+        
+        .auth-form {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+        }
+        
+        .auth-form.active {
+            display: flex;
+        }
+        
+        .form-scroll-container {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .form-scroll-container::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .form-scroll-container::-webkit-scrollbar-track {
+            background: rgba(30, 30, 46, 0.5);
+            border-radius: 3px;
+        }
+        
+        .form-scroll-container::-webkit-scrollbar-thumb {
+            background: var(--neon-blue);
+            border-radius: 3px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+            animation: floatIn 0.4s ease forwards;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(30, 30, 46, 0.7);
+            border: 1px solid var(--stardust);
+            border-radius: 10px;
+            color: white;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 0 2px rgba(0, 245, 212, 0.2);
+        }
+        
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .password-toggle {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .password-toggle:hover {
+            color: var(--neon-blue);
+        }
+        
+        .remember-forgot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            animation: floatIn 0.4s ease 0.6s forwards;
+            opacity: 0;
+        }
+        
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+        
+        .remember-me input {
+            margin-right: 0.5rem;
+            accent-color: var(--neon-blue);
+        }
+        
+        .remember-me label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+        
+        .forgot-password {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 10px;
+            background: linear-gradient(45deg, var(--electric-purple), var(--magenta));
+            color: white;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            margin-bottom: 1.5rem;
+            animation: floatIn 0.4s ease 0.5s forwards;
+            opacity: 0;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(155, 93, 229, 0.4);
+        }
+        
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            margin: 1rem 0;
+            color: rgba(255, 255, 255, 0.3);
+            animation: floatIn 0.4s ease 0.7s forwards;
+            opacity: 0;
+        }
+        
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--stardust);
+        }
+        
+        .auth-divider::before {
+            margin-right: 1rem;
+        }
+        
+        .auth-divider::after {
+            margin-left: 1rem;
+        }
+        
+        .social-auth {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            animation: floatIn 0.4s ease 0.8s forwards;
+            opacity: 0;
+        }
+        
+        .social-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            border-radius: 10px;
+            background: rgba(30, 30, 46, 0.7);
+            border: 1px solid var(--stardust);
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .social-btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--neon-blue);
+        }
+        
+        .social-btn i {
+            font-size: 1.2rem;
+        }
+        
+        .auth-footer {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            padding-top: 1rem;
+            margin-top: auto;
+            animation: floatIn 0.4s ease 0.9s forwards;
+            opacity: 0;
+        }
+        
+        .auth-footer a {
+            color: var(--neon-blue);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        /* Animation for form inputs */
+        @keyframes floatIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .form-group:nth-child(1) { animation-delay: 0.1s; }
+        .form-group:nth-child(2) { animation-delay: 0.2s; }
+        .form-group:nth-child(3) { animation-delay: 0.3s; }
+        .form-group:nth-child(4) { animation-delay: 0.4s; }
+        
+        @media (max-width: 1024px) {
+            #finance-visualization {
+                opacity: 0.3;
+                right: -10%;
+            }
+            
+            .hero-content {
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .navbar {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+            
+            .nav-links {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            #finance-visualization {
+                display: none;
+            }
+            
+            .stats {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .auth-modal {
+                width: 90%;
+                padding: 1.5rem;
+            }
+            
+            .social-auth {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-height: 700px) {
+            .auth-modal {
+                max-height: 85vh;
+            }
+            
+            .auth-header h2 {
+                font-size: 1.8rem;
+            }
+            
+            .auth-header p {
+                font-size: 0.9rem;
+            }
+            
+            .form-group {
+                margin-bottom: 1rem;
+            }
+            
+            .auth-tab {
+                padding: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar">
+            <a href="Neuro.html" class="logo">
+                <i class="fas fa-brain logo-icon"></i>
+                <span>NeuroFinance</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="Neurodash.html">Dashboard</a>
+                <a href="Neurotras.html">Transactions</a>
+                <a href="Neurobud.html">Budgeting</a>
+                <a href="Neuroinv.html">Investments</a>
+                <a href="Neurosav.html">Savings</a>
+            </div>
+            
+            <div class="auth-buttons">
+                <button class="btn btn-outline" id="loginBtn">Login</button>
+                <button class="btn btn-primary" id="signupBtn">Sign Up</button>
+            </div>
+        </nav>
+    </header>
+    
+    <section class="hero">
+        <div id="finance-visualization">
+            <div class="loading-visualization">Initializing quantum financial visualization...</div>
+        </div>
+        
+        <div class="hero-content">
+            <h1>Your Financial Future, Powered by AI</h1>
+            <p>NeuroFinance combines neuroscience and artificial intelligence to optimize your spending habits and maximize your savings potential.</p>
+            
+            <div class="hero-buttons">
+                <button class="btn btn-primary">Start Free Trial</button>
+                <button class="btn btn-outline">See How It Works</button>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-item">
+                    <h3>+2,450%</h3>
+                    <p>Average savings increase</p>
+                </div>
+                <div class="stat-item">
+                    <h3>AI-Powered</h3>
+                    <p>Real-time spending analysis</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="features">
+        <div class="section-title">
+            <h2>Revolutionary Features</h2>
+            <p>We're redefining personal finance with cutting-edge technology</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-brain"></i>
+                </div>
+                <h3>Neural Budgeting</h3>
+                <p>Our AI learns your spending patterns and automatically creates personalized budgets that actually work for your lifestyle.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Impulse Shield</h3>
+                <p>Get real-time warnings when you're about to make emotional purchases, with alternative suggestions to stay on track.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-network"></i>
+                </div>
+                <h3>Wealth Pathways</h3>
+                <p>Visualize multiple financial futures based on your current habits and discover the fastest route to your goals.</p>
+            </div>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>NeuroFinance</h3>
+                <p>The future of personal finance management powered by artificial intelligence and neuroscience.</p>
+                <div class="footer-social">
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-linkedin"></i></a>
+                    <a href="#"><i class="fab fa-github"></i></a>
+                    <a href="#"><i class="fab fa-discord"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Product</h3>
+                <ul>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Pricing</a></li>
+                    <li><a href="#">API</a></li>
+                    <li><a href="#">Integrations</a></li>
+                    <li><a href="#">Roadmap</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">Guides</a></li>
+                    <li><a href="#">Blog</a></li>
+                    <li><a href="#">Research</a></li>
+                    <li><a href="#">Support</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Company</h3>
+                <ul>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2023 NeuroFinance. All rights reserved. | Designed for the future of finance</p>
+        </div>
+    </footer>
+    
+    <div class="ai-bubble">
+        <i class="fas fa-robot"></i>
+    </div>
+    
+    <!-- Auth Modal -->
+    <div class="modal-overlay" id="authModal">
+        <div class="auth-modal">
+            <button class="close-modal" id="closeModal">&times;</button>
+            
+            <div class="auth-header">
+                <h2>Welcome to NeuroFinance</h2>
+                <p>Your AI-powered financial companion</p>
+            </div>
+            
+            <div class="auth-tabs">
+                <div class="auth-tab active" data-tab="login">Login</div>
+                <div class="auth-tab" data-tab="signup">Sign Up</div>
+            </div>
+            
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm">
+                <div class="form-scroll-container">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="your@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <div style="position: relative;">
+                            <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                            <i class="fas fa-eye password-toggle" id="toggleLoginPassword"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="remember-forgot">
+                        <div class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Remember me</label>
+                        </div>
+                        <a href="#" class="forgot-password">Forgot password?</a>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Login</button>
+                    
+                    <div class="auth-divider">
+                        <span>or continue with</span>
+                    </div>
+                    
+                    <div class="social-auth">
+                        <button type="button" class="social-btn">
+                            <i class="fab fa-google"></i>
+                        </button>
+                        <button type="button" class="social-btn">
+                            <i class="fab fa-apple"></i>
+                        </button>
+                        <button type="button" class="social-btn">
+                            <i class="fab fa-github"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="auth-footer">
+                    Don't have an account? <a href="#" class="switch-to-signup">Sign up</a>
+                </div>
+            </form>
+            
+            <!-- Signup Form -->
+            <form class="auth-form" id="signupForm">
+                <div class="form-scroll-container">
+                    <div class="form-group">
+                        <label for="signupName">Full Name</label>
+                        <input type="text" id="signupName" class="form-control" placeholder="John Doe" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" class="form-control" placeholder="your@email.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <div style="position: relative;">
+                            <input type="password" id="signupPassword" class="form-control" placeholder="••••••••" required>
+                            <i class="fas fa-eye password-toggle" id="toggleSignupPassword"></i>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div style="position: relative;">
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="••••••••" required>
+                            <i class="fas fa-eye password-toggle" id="toggleConfirmPassword"></i>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">Create Account</button>
+                    
+                    <div class="auth-divider">
+                        <span>or sign up with</span>
+                    </div>
+                    
+                    <div class="social-auth">
+                        <button type="button" class="social-btn">
+                            <i class="fab fa-google"></i>
+                        </button>
+                        <button type="button" class="social-btn">
+                            <i class="fab fa-apple"></i>
+                        </button>
+                        <button type="button" class="social-btn">
+                            <i class="fab fa-github"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="auth-footer">
+                    Already have an account? <a href="#" class="switch-to-login">Login</a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize futuristic visualization
+            const container = document.getElementById('finance-visualization');
+            const loadingMessage = container.querySelector('.loading-visualization');
+            
+            // Check if Three.js is loaded
+            if (!window.THREE) {
+                loadingMessage.textContent = "Error: Visualization library failed to load. Please refresh.";
+                return;
+            }
+            
+            // Create scene
+            const scene = new THREE.Scene();
+            scene.background = null;
+            
+            // Create camera
+            const camera = new THREE.PerspectiveCamera(
+                75, 
+                container.clientWidth / container.clientHeight, 
+                0.1, 
+                1000
+            );
+            camera.position.set(0, 0, 15);
+            
+            // Create renderer
+            const renderer = new THREE.WebGLRenderer({ 
+                antialias: true, 
+                alpha: true 
+            });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+            
+            // Remove loading message
+            loadingMessage.remove();
+            
+            // Create a particle system for the cosmic background
+            const createCosmicParticles = () => {
+                const particlesGeometry = new THREE.BufferGeometry();
+                const particleCount = 2000;
+                const posArray = new Float32Array(particleCount * 3);
+                
+                for (let i = 0; i < particleCount * 3; i++) {
+                    posArray[i] = (Math.random() - 0.5) * 100;
+                }
+                
+                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+                
+                const particlesMaterial = new THREE.PointsMaterial({
+                    size: 0.1,
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.8,
+                    blending: THREE.AdditiveBlending
+                });
+                
+                const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+                scene.add(particles);
+                
+                return particles;
+            };
+            
+            // Create financial data streams
+            const createDataStreams = () => {
+                const group = new THREE.Group();
+                const colors = [0x00f5d4, 0x9b5de5, 0xf15bb5, 0xfee440];
+                
+                for (let i = 0; i < 4; i++) {
+                    const points = [];
+                    const height = 5 + Math.random() * 5;
+                    
+                    for (let j = 0; j < 20; j++) {
+                        points.push(new THREE.Vector3(
+                            (i - 1.5) * 4,
+                            Math.sin(j * 0.3) * height * 0.5,
+                            j * -1
+                        ));
+                    }
+                    
+                    const lineGeometry = new THREE.BufferGeometry().setFromPoints(points);
+                    const lineMaterial = new THREE.LineBasicMaterial({
+                        color: colors[i],
+                        transparent: true,
+                        opacity: 0.7,
+                        linewidth: 2
+                    });
+                    
+                    const line = new THREE.Line(lineGeometry, lineMaterial);
+                    group.add(line);
+                    
+                    // Add glowing dots along the line
+                    const dotGeometry = new THREE.BufferGeometry();
+                    const dotPositions = new Float32Array(points.length * 3);
+                    const dotSizes = new Float32Array(points.length);
+                    
+                    points.forEach((point, index) => {
+                        dotPositions[index * 3] = point.x;
+                        dotPositions[index * 3 + 1] = point.y;
+                        dotPositions[index * 3 + 2] = point.z;
+                        dotSizes[index] = 0.5 + Math.random() * 0.5;
+                    });
+                    
+                    dotGeometry.setAttribute('position', new THREE.BufferAttribute(dotPositions, 3));
+                    dotGeometry.setAttribute('size', new THREE.BufferAttribute(dotSizes, 1));
+                    
+                    const dotMaterial = new THREE.PointsMaterial({
+                        size: 0.5,
+                        color: colors[i],
+                        transparent: true,
+                        opacity: 0.9,
+                        blending: THREE.AdditiveBlending,
+                        sizeAttenuation: true
+                    });
+                    
+                    const dots = new THREE.Points(dotGeometry, dotMaterial);
+                    group.add(dots);
+                }
+                
+                scene.add(group);
+                return group;
+            };
+            
+            // Create floating financial indicators
+            const createFinancialIndicators = () => {
+                const group = new THREE.Group();
+                const colors = [0x00f5d4, 0x9b5de5, 0xf15bb5, 0xfee440];
+                const shapes = [];
+                
+                // Create different financial indicator shapes
+                for (let i = 0; i < 4; i++) {
+                    const shape = new THREE.Group();
+                    
+                    // Main shape
+                    let geometry;
+                    if (i === 0) {
+                        geometry = new THREE.TorusGeometry(1, 0.3, 16, 32);
+                    } else if (i === 1) {
+                        geometry = new THREE.IcosahedronGeometry(1, 0);
+                    } else if (i === 2) {
+                        geometry = new THREE.ConeGeometry(1, 2, 32);
+                    } else {
+                        geometry = new THREE.OctahedronGeometry(1.5, 0);
+                    }
+                    
+                    const material = new THREE.MeshBasicMaterial({
+                        color: colors[i],
+                        wireframe: true,
+                        transparent: true,
+                        opacity: 0.7
+                    });
+                    
+                    const mesh = new THREE.Mesh(geometry, material);
+                    shape.add(mesh);
+                    
+                    // Glowing core
+                    const coreGeometry = new THREE.SphereGeometry(0.3, 16, 16);
+                    const coreMaterial = new THREE.MeshBasicMaterial({
+                        color: colors[i],
+                        transparent: true,
+                        opacity: 0.9,
+                        blending: THREE.AdditiveBlending
+                    });
+                    
+                    const core = new THREE.Mesh(coreGeometry, coreMaterial);
+                    shape.add(core);
+                    
+                    // Position the shape
+                    shape.position.x = (Math.random() - 0.5) * 10;
+                    shape.position.y = (Math.random() - 0.5) * 10;
+                    shape.position.z = (Math.random() - 0.5) * 10;
+                    
+                    shapes.push(shape);
+                    group.add(shape);
+                }
+                
+                scene.add(group);
+                return { group, shapes };
+            };
+            
+            // Create elements
+            const cosmicParticles = createCosmicParticles();
+            const dataStreams = createDataStreams();
+            const financialIndicators = createFinancialIndicators();
+            
+            // Add ambient light
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+            
+            // Add directional light
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.set(1, 1, 1);
+            scene.add(directionalLight);
+            
+            // Add point lights for each financial indicator
+            const pointLights = financialIndicators.shapes.map(indicator => {
+                const light = new THREE.PointLight(indicator.children[0].material.color, 1, 10);
+                light.position.copy(indicator.position);
+                scene.add(light);
+                return light;
+            });
+            
+            // Animation loop
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                // Animate cosmic particles
+                const particlesPositions = cosmicParticles.geometry.attributes.position.array;
+                for (let i = 0; i < particlesPositions.length / 3; i++) {
+                    particlesPositions[i * 3 + 2] += 0.05;
+                    if (particlesPositions[i * 3 + 2] > 10) {
+                        particlesPositions[i * 3 + 2] = -50;
+                    }
+                }
+                cosmicParticles.geometry.attributes.position.needsUpdate = true;
+                
+                // Animate data streams
+                dataStreams.rotation.y += 0.002;
+                
+                // Animate financial indicators
+                financialIndicators.shapes.forEach((shape, index) => {
+                    shape.rotation.x += 0.01;
+                    shape.rotation.y += 0.01;
+                    
+                    // Gentle floating motion
+                    shape.position.y += Math.sin(Date.now() * 0.001 + index) * 0.005;
+                    
+                    // Update corresponding light position
+                    pointLights[index].position.copy(shape.position);
+                });
+                
+                renderer.render(scene, camera);
+            }
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+            
+            animate();
+            
+            // AI Bubble Interaction
+            const aiBubble = document.querySelector('.ai-bubble');
+            aiBubble.addEventListener('click', function() {
+                alert("Hello! I'm your NeuroFinance AI assistant. How can I help you with your finances today?");
+            });
+            
+            // Animate feature cards on scroll
+            const featureCards = document.querySelectorAll('.feature-card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = 1;
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, { threshold: 0.1 });
+            
+            featureCards.forEach(card => {
+                card.style.opacity = 0;
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'all 0.6s ease';
+                observer.observe(card);
+            });
+
+            // Auth Modal Functionality
+            const authModal = document.getElementById('authModal');
+            const closeModal = document.getElementById('closeModal');
+            const loginBtn = document.getElementById('loginBtn');
+            const signupBtn = document.getElementById('signupBtn');
+            
+            // Form elements
+            const loginForm = document.getElementById('loginForm');
+            const signupForm = document.getElementById('signupForm');
+            const authTabs = document.querySelectorAll('.auth-tab');
+            const switchToSignup = document.querySelector('.switch-to-signup');
+            const switchToLogin = document.querySelector('.switch-to-login');
+            
+            // Password toggles
+            const toggleLoginPassword = document.getElementById('toggleLoginPassword');
+            const toggleSignupPassword = document.getElementById('toggleSignupPassword');
+            const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+            
+            // Open modal functions
+            function openLoginModal() {
+                authModal.classList.add('active');
+                switchTab('login');
+            }
+            
+            function openSignupModal() {
+                authModal.classList.add('active');
+                switchTab('signup');
+            }
+            
+            // Close modal
+            function closeAuthModal() {
+                authModal.classList.remove('active');
+            }
+            
+            // Switch between login and signup tabs
+            function switchTab(tabName) {
+                authTabs.forEach(tab => {
+                    if (tab.dataset.tab === tabName) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+                
+                if (tabName === 'login') {
+                    loginForm.classList.add('active');
+                    signupForm.classList.remove('active');
+                } else {
+                    loginForm.classList.remove('active');
+                    signupForm.classList.add('active');
+                }
+            }
+            
+            // Toggle password visibility
+            function togglePasswordVisibility(inputId, toggleIcon) {
+                const input = document.getElementById(inputId);
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    toggleIcon.classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    toggleIcon.classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            }
+            
+            // Event listeners
+            loginBtn.addEventListener('click', openLoginModal);
+            signupBtn.addEventListener('click', openSignupModal);
+            closeModal.addEventListener('click', closeAuthModal);
+            
+            authModal.addEventListener('click', function(e) {
+                if (e.target === authModal) {
+                    closeAuthModal();
+                }
+            });
+            
+            authTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    switchTab(this.dataset.tab);
+                });
+            });
+            
+            switchToSignup.addEventListener('click', function(e) {
+                e.preventDefault();
+                switchTab('signup');
+            });
+            
+            switchToLogin.addEventListener('click', function(e) {
+                e.preventDefault();
+                switchTab('login');
+            });
+            
+            toggleLoginPassword.addEventListener('click', function() {
+                togglePasswordVisibility('loginPassword', this);
+            });
+            
+            toggleSignupPassword.addEventListener('click', function() {
+                togglePasswordVisibility('signupPassword', this);
+            });
+            
+            toggleConfirmPassword.addEventListener('click', function() {
+                togglePasswordVisibility('confirmPassword', this);
+            });
+            
+            // Form submission
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                // Add your login logic here
+                alert('Login functionality would be implemented here');
+                closeAuthModal();
+            });
+            
+            signupForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const password = document.getElementById('signupPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                
+                if (password !== confirmPassword) {
+                    alert('Passwords do not match!');
+                    return;
+                }
+                
+                // Add your signup logic here
+                alert('Account created successfully! (This would connect to your backend in production)');
+                closeAuthModal();
+            });
+            
+            // Close modal with Escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && authModal.classList.contains('active')) {
+                    closeAuthModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

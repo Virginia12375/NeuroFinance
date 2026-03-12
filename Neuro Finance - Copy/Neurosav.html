@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroFinance | Smart Savings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <style>
+        :root {
+            --neon-blue: #00f5d4;
+            --electric-purple: #9b5de5;
+            --magenta: #f15bb5;
+            --vivid-yellow: #fee440;
+            --deep-space: #0a0a1a;
+            --cosmic-gray: #1e1e2e;
+            --stardust: rgba(255, 255, 255, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--deep-space);
+            color: white;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: rgba(10, 10, 26, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 2rem 1rem;
+            border-right: 1px solid var(--cosmic-gray);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            padding-left: 0.5rem;
+        }
+        
+        .logo-icon {
+            font-size: 1.75rem;
+            color: var(--magenta);
+        }
+        
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .nav-item {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            background: rgba(155, 93, 229, 0.2);
+            border-left: 3px solid var(--electric-purple);
+        }
+        
+        .nav-item:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            padding: 2rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, var(--neon-blue), var(--vivid-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header-controls {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(45deg, var(--electric-purple), var(--magenta));
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(155, 93, 229, 0.3);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--neon-blue);
+            color: var(--neon-blue);
+        }
+        
+        .btn-outline:hover {
+            background: var(--neon-blue);
+            color: var(--deep-space);
+        }
+        
+        /* Savings Overview */
+        .savings-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .savings-card {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .savings-card:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-5px);
+        }
+        
+        .savings-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .savings-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--neon-blue);
+        }
+        
+        .savings-card-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .savings-card-progress {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-safe {
+            background: var(--neon-blue);
+        }
+        
+        .progress-warning {
+            background: var(--vivid-yellow);
+        }
+        
+        .progress-danger {
+            background: var(--magenta);
+        }
+        
+        .savings-card-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Savings Goals */
+        .goals-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-container {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .chart-period {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .period-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .period-btn.active {
+            background: rgba(155, 93, 229, 0.3);
+            color: white;
+        }
+        
+        .period-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Savings Accounts */
+        .accounts-section {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 2rem;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .view-all {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            text-align: left;
+            padding: 1rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .account-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        
+        .account-apy {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        
+        .account-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .action-btn:hover {
+            background: var(--electric-purple);
+            transform: translateY(-2px);
+        }
+        
+        /* AI Savings Tips */
+        .tips-section {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .tip-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .tip-card:hover {
+            background: rgba(155, 93, 229, 0.2);
+        }
+        
+        .tip-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+        
+        .tip-boost .tip-icon {
+            background: rgba(0, 245, 212, 0.1);
+            color: var(--neon-blue);
+        }
+        
+        .tip-alert .tip-icon {
+            background: rgba(241, 91, 181, 0.1);
+            color: var(--magenta);
+        }
+        
+        .tip-opportunity .tip-icon {
+            background: rgba(254, 228, 64, 0.1);
+            color: var(--vivid-yellow);
+        }
+        
+        .tip-content {
+            flex: 1;
+        }
+        
+        .tip-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        
+        .tip-desc {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .tip-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        /* AI Assistant */
+        .ai-assistant {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--electric-purple), var(--magenta));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(155, 93, 229, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+        
+        .ai-assistant i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            .goals-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-grid">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <a href="index.html" class="logo">
+                <i class="fas fa-brain logo-icon"></i>
+                <span>NeuroFinance</span>
+            </a>
+            
+            <nav class="nav-menu">
+                <div class="nav-item">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transactions</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Budgeting</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Investments</span>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-piggy-bank"></i>
+                    <span>Savings</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="header">
+                <h1>Smart Savings Hub</h1>
+                <div class="header-controls">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        <span>New Goal</span>
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="fas fa-magic"></i>
+                        <span>AI Optimize</span>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- Savings Overview Cards -->
+            <section class="savings-overview">
+                <div class="savings-card">
+                    <div class="savings-card-header">
+                        <div class="savings-card-title">Total Savings</div>
+                        <i class="fas fa-piggy-bank" style="color: var(--neon-blue)"></i>
+                    </div>
+                    <div class="savings-card-value">$18,425.90</div>
+                    <div class="savings-card-progress">
+                        <div class="progress-bar progress-safe" style="width: 62%"></div>
+                    </div>
+                    <div class="savings-card-details">
+                        <span>Monthly Growth: +$1,250</span>
+                        <span>+8.2% YTD</span>
+                    </div>
+                </div>
+                
+                <div class="savings-card">
+                    <div class="savings-card-header">
+                        <div class="savings-card-title">Emergency Fund</div>
+                        <i class="fas fa-shield-alt" style="color: var(--electric-purple)"></i>
+                    </div>
+                    <div class="savings-card-value">$10,000</div>
+                    <div class="savings-card-progress">
+                        <div class="progress-bar progress-safe" style="width: 100%"></div>
+                    </div>
+                    <div class="savings-card-details">
+                        <span>Status: Complete</span>
+                        <span>3.2% APY</span>
+                    </div>
+                </div>
+                
+                <div class="savings-card">
+                    <div class="savings-card-header">
+                        <div class="savings-card-title">Dream Vacation</div>
+                        <i class="fas fa-umbrella-beach" style="color: var(--vivid-yellow)"></i>
+                    </div>
+                    <div class="savings-card-value">$4,725/$7,500</div>
+                    <div class="savings-card-progress">
+                        <div class="progress-bar progress-warning" style="width: 63%"></div>
+                    </div>
+                    <div class="savings-card-details">
+                        <span>Months Left: 7</span>
+                        <span>On Track: Yes</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Savings Goals Charts -->
+            <section class="goals-section">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Savings Progress</div>
+                        <div class="chart-period">
+                            <button class="period-btn">3M</button>
+                            <button class="period-btn active">6M</button>
+                            <button class="period-btn">1Y</button>
+                            <button class="period-btn">All</button>
+                        </div>
+                    </div>
+                    <div id="savingsProgressChart"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Savings Allocation</div>
+                        <div class="chart-period">
+                            <button class="period-btn active">Current</button>
+                            <button class="period-btn">Target</button>
+                        </div>
+                    </div>
+                    <div id="savingsAllocationChart"></div>
+                </div>
+            </section>
+            
+            <!-- Savings Accounts -->
+            <section class="accounts-section">
+                <div class="section-header">
+                    <div class="section-title">Your Savings Accounts</div>
+                    <a href="#" class="view-all">
+                        <span>Add Account</span>
+                        <i class="fas fa-plus"></i>
+                    </a>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Account</th>
+                            <th>Balance</th>
+                            <th>APY</th>
+                            <th>Goal</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="account-info">
+                                    <div class="account-icon" style="background: rgba(0, 245, 212, 0.1); color: var(--neon-blue);">
+                                        <i class="fas fa-shield-alt"></i>
+                                    </div>
+                                    <div>
+                                        <div>Emergency Fund</div>
+                                        <div style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">High-Yield Savings</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>$10,000.00</td>
+                            <td class="account-apy positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>3.20%</span>
+                            </td>
+                            <td>100%</td>
+                            <td>
+                                <div class="account-actions">
+                                    <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                                    <button class="action-btn"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="account-info">
+                                    <div class="account-icon" style="background: rgba(155, 93, 229, 0.1); color: var(--electric-purple);">
+                                        <i class="fas fa-umbrella-beach"></i>
+                                    </div>
+                                    <div>
+                                        <div>Dream Vacation</div>
+                                        <div style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">Goal Savings</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>$4,725.00</td>
+                            <td class="account-apy positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>2.75%</span>
+                            </td>
+                            <td>63%</td>
+                            <td>
+                                <div class="account-actions">
+                                    <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                                    <button class="action-btn"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="account-info">
+                                    <div class="account-icon" style="background: rgba(241, 91, 181, 0.1); color: var(--magenta);">
+                                        <i class="fas fa-home"></i>
+                                    </div>
+                                    <div>
+                                        <div>House Downpayment</div>
+                                        <div style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">Money Market</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>$2,150.00</td>
+                            <td class="account-apy positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>3.80%</span>
+                            </td>
+                            <td>14%</td>
+                            <td>
+                                <div class="account-actions">
+                                    <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                                    <button class="action-btn"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="account-info">
+                                    <div class="account-icon" style="background: rgba(254, 228, 64, 0.1); color: var(--vivid-yellow);">
+                                        <i class="fas fa-car"></i>
+                                    </div>
+                                    <div>
+                                        <div>New Vehicle</div>
+                                        <div style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.7);">CD Ladder</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>$1,550.90</td>
+                            <td class="account-apy positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>4.25%</span>
+                            </td>
+                            <td>10%</td>
+                            <td>
+                                <div class="account-actions">
+                                    <button class="action-btn"><i class="fas fa-chart-line"></i></button>
+                                    <button class="action-btn"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+            
+            <!-- AI Savings Tips -->
+            <section class="tips-section">
+                <div class="section-header">
+                    <div class="section-title">AI Savings Recommendations</div>
+                    <a href="#" class="view-all">
+                        <span>View All</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+                
+                <div class="tip-card tip-boost">
+                    <div class="tip-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="tip-content">
+                        <div class="tip-title">Boost Your Savings Rate</div>
+                        <div class="tip-desc">Based on recent spending patterns, you could save an additional $275/month by optimizing 3 recurring subscriptions</div>
+                    </div>
+                    <div class="tip-actions">
+                        <button class="action-btn"><i class="fas fa-info-circle"></i></button>
+                        <button class="action-btn"><i class="fas fa-check"></i></button>
+                    </div>
+                </div>
+                
+                <div class="tip-card tip-alert">
+                    <div class="tip-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="tip-content">
+                        <div class="tip-title">Higher APY Available</div>
+                        <div class="tip-desc">Move $5,000 from your checking to a new high-yield savings account (4.25% APY) to earn $212 more annually</div>
+                    </div>
+                    <div class="tip-actions">
+                        <button class="action-btn"><i class="fas fa-info-circle"></i></button>
+                        <button class="action-btn"><i class="fas fa-check"></i></button>
+                    </div>
+                </div>
+                
+                <div class="tip-card tip-opportunity">
+                    <div class="tip-icon">
+                        <i class="fas fa-lightbulb"></i>
+                    </div>
+                    <div class="tip-content">
+                        <div class="tip-title">Round-Up Opportunity</div>
+                        <div class="tip-desc">Enable round-up savings on debit purchases to automatically save ~$85/month with minimal impact</div>
+                    </div>
+                    <div class="tip-actions">
+                        <button class="action-btn"><i class="fas fa-info-circle"></i></button>
+                        <button class="action-btn"><i class="fas fa-check"></i></button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+    
+    <!-- AI Assistant -->
+    <div class="ai-assistant">
+        <i class="fas fa-robot"></i>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Savings Progress Chart
+            var progressOptions = {
+                series: [{
+                    name: 'Actual Savings',
+                    data: [12000, 12500, 13200, 14100, 14500, 15200, 16000, 17200, 18000, 18425]
+                }, {
+                    name: 'Projected Path',
+                    data: [12000, 12650, 13300, 13950, 14600, 15250, 15900, 16550, 17200, 17850]
+                }],
+                chart: {
+                    height: 350,
+                    type: 'area',
+                    foreColor: '#fff',
+                    toolbar: {
+                        show: true,
+                        tools: {
+                            download: true,
+                            selection: false,
+                            zoom: false,
+                            zoomin: false,
+                            zoomout: false,
+                            pan: false,
+                            reset: false
+                        }
+                    },
+                    background: 'transparent'
+                },
+                colors: ['#00f5d4', '#9b5de5'],
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 2
+                },
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.7,
+                        opacityTo: 0.3,
+                        stops: [0, 90, 100]
+                    }
+                },
+                xaxis: {
+                    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    axisBorder: {
+                        show: true,
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    },
+                    axisTicks: {
+                        show: true,
+                        color: 'rgba(255, 255, 255, 0.1)'
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        formatter: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return "$" + val.toLocaleString()
+                        }
+                    }
+                },
+                grid: {
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    strokeDashArray: 4
+                },
+                legend: {
+                    position: 'top',
+                    labels: {
+                        colors: ['#fff']
+                    }
+                }
+            };
+            
+            var progressChart = new ApexCharts(document.querySelector("#savingsProgressChart"), progressOptions);
+            progressChart.render();
+            
+            // Savings Allocation Chart
+            var allocationOptions = {
+                series: [44, 22, 12, 8, 14],
+                labels: ['Emergency Fund', 'Vacation', 'House Downpayment', 'New Vehicle', 'General Savings'],
+                chart: {
+                    type: 'donut',
+                    foreColor: '#fff',
+                    background: 'transparent'
+                },
+                colors: ['#00f5d4', '#9b5de5', '#f15bb5', '#fee440', '#ffffff'],
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 200
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }],
+                legend: {
+                    position: 'right',
+                    labels: {
+                        colors: ['#fff']
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Total',
+                                    color: '#fff',
+                                    formatter: function(w) {
+                                        return '$' + w.globals.seriesTotals.reduce((a, b) => a + b, 0).toLocaleString()
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            
+            var allocationChart = new ApexCharts(document.querySelector("#savingsAllocationChart"), allocationOptions);
+            allocationChart.render();
+            
+            // Period buttons functionality
+            const periodButtons = document.querySelectorAll('.period-btn');
+            periodButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const parent = this.closest('.chart-period');
+                    parent.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // In a real app, this would update the chart data
+                    console.log(`Showing data for: ${this.textContent}`);
+                });
+            });
+            
+            // AI Assistant interaction
+            const aiAssistant = document.querySelector('.ai-assistant');
+            aiAssistant.addEventListener('click', function() {
+                alert("Hello! I'm your NeuroFinance savings assistant. I can help you:\n\n- Find the best savings accounts\n- Optimize your savings strategy\n- Set and track financial goals\n- Automate your savings\n\nHow can I help you save more today?");
+            });
+            
+            // AI Optimize button
+            const aiOptimizeBtn = document.querySelector('.btn-outline');
+            aiOptimizeBtn.addEventListener('click', function() {
+                alert("AI Savings Optimization:\n\n1. Reallocate funds to higher APY accounts (+$312/year)\n2. Set up automatic transfers on paydays\n3. Reduce checking account buffer by $1,000\n4. Create CD ladder for mid-term goals\n\nApply these optimizations?");
+            });
+            
+            // Action buttons
+            const actionButtons = document.querySelectorAll('.action-btn');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const action = this.querySelector('i').className;
+                    
+                    if (action.includes('chart-line')) {
+                        alert("Showing detailed savings trends");
+                    } else if (action.includes('pencil-alt')) {
+                        alert("Editing savings account details");
+                    } else if (action.includes('info-circle')) {
+                        alert("Showing detailed recommendation analysis");
+                    } else if (action.includes('check')) {
+                        alert("Applying this savings recommendation");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

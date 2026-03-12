@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroFinance | AI Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --neon-blue: #00f5d4;
+            --electric-purple: #9b5de5;
+            --magenta: #f15bb5;
+            --vivid-yellow: #fee440;
+            --deep-space: #0a0a1a;
+            --cosmic-gray: #1e1e2e;
+            --stardust: rgba(255, 255, 255, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+            background-color: var(--deep-space);
+            color: white;
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            background: rgba(10, 10, 26, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 2rem 1rem;
+            border-right: 1px solid var(--cosmic-gray);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            text-decoration: none;
+            margin-bottom: 2rem;
+            padding-left: 0.5rem;
+        }
+        
+        .logo-icon {
+            font-size: 1.75rem;
+            color: var(--magenta);
+        }
+        
+        .nav-menu {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .nav-item {
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            background: rgba(155, 93, 229, 0.2);
+            border-left: 3px solid var(--electric-purple);
+        }
+        
+        .nav-item:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .nav-item i {
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            padding: 2rem;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .header h1 {
+            font-size: 2rem;
+            background: linear-gradient(45deg, var(--neon-blue), var(--vivid-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .user-controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--electric-purple), var(--magenta));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        /* Dashboard Widgets */
+        .widgets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .widget {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .widget:hover {
+            border-color: var(--neon-blue);
+            transform: translateY(-5px);
+        }
+        
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .widget-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--neon-blue);
+        }
+        
+        .widget-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .widget-change {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .positive {
+            color: #00f5d4;
+        }
+        
+        .negative {
+            color: #f15bb5;
+        }
+        
+        /* Charts Section */
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .chart-container {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .chart-period {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .period-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .period-btn.active {
+            background: rgba(155, 93, 229, 0.3);
+            color: white;
+        }
+        
+        .period-btn:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Transactions Table */
+        .transactions-section {
+            background: rgba(30, 30, 46, 0.6);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+        
+        .view-all {
+            color: var(--neon-blue);
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.7);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .transaction-category {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .category-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(0, 245, 212, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--neon-blue);
+        }
+        
+        .transaction-amount.income {
+            color: var(--neon-blue);
+        }
+        
+        .transaction-amount.expense {
+            color: var(--magenta);
+        }
+        
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-completed {
+            background: rgba(0, 245, 212, 0.1);
+            color: var(--neon-blue);
+        }
+        
+        .status-pending {
+            background: rgba(254, 228, 64, 0.1);
+            color: var(--vivid-yellow);
+        }
+        
+        /* AI Assistant */
+        .ai-assistant {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--electric-purple), var(--magenta));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            box-shadow: 0 5px 15px rgba(155, 93, 229, 0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .ai-assistant:hover {
+            transform: scale(1.1);
+        }
+        
+        .ai-assistant i {
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 1200px) {
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: none;
+            }
+            
+            .widgets-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .widgets-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-grid">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <a href="Neuro.html" class="logo">
+                <i class="fas fa-brain logo-icon"></i>
+                <span>NeuroFinance</span>
+            </a>
+            
+            <nav class="nav-menu">
+                <div class="nav-item active">
+                    <i class="fas fa-chart-pie"></i>
+                    <span>Dashboard</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-exchange-alt"></i>
+                    <span>Transactions</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-wallet"></i>
+                    <span>Budgeting</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Investments</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-piggy-bank"></i>
+                    <span>Savings</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </div>
+            </nav>
+        </aside>
+        
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="header">
+                <h1>Financial Dashboard</h1>
+                <div class="user-controls">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Summary Widgets -->
+            <section class="widgets-grid">
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">Total Balance</div>
+                        <i class="fas fa-coins" style="color: var(--vivid-yellow)"></i>
+                    </div>
+                    <div class="widget-value">$12,458.90</div>
+                    <div class="widget-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+12.4% from last month</span>
+                    </div>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">Monthly Income</div>
+                        <i class="fas fa-arrow-down" style="color: var(--neon-blue)"></i>
+                    </div>
+                    <div class="widget-value">$4,250.00</div>
+                    <div class="widget-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+5.2% from last month</span>
+                    </div>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">Monthly Expenses</div>
+                        <i class="fas fa-arrow-up" style="color: var(--magenta)"></i>
+                    </div>
+                    <div class="widget-value">$2,845.30</div>
+                    <div class="widget-change negative">
+                        <i class="fas fa-arrow-down"></i>
+                        <span>-3.1% from last month</span>
+                    </div>
+                </div>
+                
+                <div class="widget">
+                    <div class="widget-header">
+                        <div class="widget-title">Savings Rate</div>
+                        <i class="fas fa-percentage" style="color: var(--electric-purple)"></i>
+                    </div>
+                    <div class="widget-value">33%</div>
+                    <div class="widget-change positive">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+8% from last month</span>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Charts Section -->
+            <section class="charts-row">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Spending Analytics</div>
+                        <div class="chart-period">
+                            <button class="period-btn">Day</button>
+                            <button class="period-btn">Week</button>
+                            <button class="period-btn active">Month</button>
+                            <button class="period-btn">Year</button>
+                        </div>
+                    </div>
+                    <canvas id="spendingChart"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <div class="chart-title">Budget Allocation</div>
+                        <div class="chart-period">
+                            <button class="period-btn active">Current</button>
+                            <button class="period-btn">Projected</button>
+                        </div>
+                    </div>
+                    <canvas id="budgetChart"></canvas>
+                </div>
+            </section>
+            
+            <!-- Recent Transactions -->
+            <section class="transactions-section">
+                <div class="section-header">
+                    <div class="section-title">Recent Transactions</div>
+                    <a href="#" class="view-all">
+                        <span>View All</span>
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="transaction-category">
+                                    <div class="category-icon">
+                                        <i class="fas fa-utensils"></i>
+                                    </div>
+                                    <span>Dining</span>
+                                </div>
+                            </td>
+                            <td>Lunch at Cafe Neo</td>
+                            <td class="transaction-amount expense">-$24.50</td>
+                            <td>Today, 12:45 PM</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="transaction-category">
+                                    <div class="category-icon" style="background: rgba(155, 93, 229, 0.1); color: var(--electric-purple);">
+                                        <i class="fas fa-shopping-bag"></i>
+                                    </div>
+                                    <span>Shopping</span>
+                                </div>
+                            </td>
+                            <td>Office Supplies</td>
+                            <td class="transaction-amount expense">-$89.30</td>
+                            <td>Yesterday, 3:22 PM</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="transaction-category">
+                                    <div class="category-icon" style="background: rgba(0, 245, 212, 0.1); color: var(--neon-blue);">
+                                        <i class="fas fa-dollar-sign"></i>
+                                    </div>
+                                    <span>Salary</span>
+                                </div>
+                            </td>
+                            <td>Monthly Paycheck</td>
+                            <td class="transaction-amount income">+$4,250.00</td>
+                            <td>May 1, 9:00 AM</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="transaction-category">
+                                    <div class="category-icon" style="background: rgba(241, 91, 181, 0.1); color: var(--magenta);">
+                                        <i class="fas fa-gamepad"></i>
+                                    </div>
+                                    <span>Entertainment</span>
+                                </div>
+                            </td>
+                            <td>Netflix Subscription</td>
+                            <td class="transaction-amount expense">-$15.99</td>
+                            <td>Apr 30, 12:00 AM</td>
+                            <td><span class="status-badge status-completed">Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="transaction-category">
+                                    <div class="category-icon" style="background: rgba(254, 228, 64, 0.1); color: var(--vivid-yellow);">
+                                        <i class="fas fa-car"></i>
+                                    </div>
+                                    <span>Transport</span>
+                                </div>
+                            </td>
+                            <td>Gas Station</td>
+                            <td class="transaction-amount expense">-$42.75</td>
+                            <td>Apr 29, 5:30 PM</td>
+                            <td><span class="status-badge status-pending">Pending</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+    
+    <!-- AI Assistant -->
+    <div class="ai-assistant">
+        <i class="fas fa-robot"></i>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize charts
+            const spendingCtx = document.getElementById('spendingChart').getContext('2d');
+            const budgetCtx = document.getElementById('budgetChart').getContext('2d');
+            
+            // Spending Chart
+            const spendingChart = new Chart(spendingCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: [3200, 3800, 4000, 3950, 4250, 4500],
+                            borderColor: '#00f5d4',
+                            backgroundColor: 'rgba(0, 245, 212, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: 'Expenses',
+                            data: [2800, 3100, 2950, 3020, 2845, 2700],
+                            borderColor: '#f15bb5',
+                            backgroundColor: 'rgba(241, 91, 181, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: 'white',
+                                font: {
+                                    family: 'Space Grotesk'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'white'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'white',
+                                callback: function(value) {
+                                    return '$' + value;
+                                }
+                            }
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            });
+            
+            // Budget Chart
+            const budgetChart = new Chart(budgetCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Housing', 'Food', 'Transport', 'Entertainment', 'Utilities', 'Savings'],
+                    datasets: [{
+                        data: [1200, 600, 300, 200, 250, 1700],
+                        backgroundColor: [
+                            '#9b5de5',
+                            '#00f5d4',
+                            '#f15bb5',
+                            '#fee440',
+                            '#ffffff',
+                            '#00f5d4'
+                        ],
+                        borderColor: 'rgba(30, 30, 46, 0.8)',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: 'white',
+                                font: {
+                                    family: 'Space Grotesk'
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += '$' + context.raw;
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '70%'
+                }
+            });
+            
+            // Period buttons functionality
+            const periodButtons = document.querySelectorAll('.period-btn');
+            periodButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    periodButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // In a real app, you would update the chart data here
+                    // based on the selected period
+                });
+            });
+            
+            // AI Assistant interaction
+            const aiAssistant = document.querySelector('.ai-assistant');
+            aiAssistant.addEventListener('click', function() {
+                alert("Hello! I'm your NeuroFinance AI assistant. I can help you:\n\n- Analyze spending patterns\n- Suggest budget optimizations\n- Answer financial questions\n- Predict future savings\n\nHow can I help you today?");
+            });
+        });
+    </script>
+</body>
+</html>
