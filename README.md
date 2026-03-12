@@ -1,4 +1,4 @@
-### NeuroFinance - AI-Powered Financial Platform
+# NeuroFinance - AI-Powered Financial Platform
 A complete financial management platform with AI-powered insights, interactive dashboards, and a futuristic user interface.
 
 ## Project Overview
@@ -18,7 +18,7 @@ Three.js - 3D visualizations (main page)
 Font Awesome - Icons
 
 ## Features
-# Authentication
+### Authentication
 Login/Signup modal with tab switching
 
 Form validation
@@ -27,7 +27,7 @@ Password visibility toggle
 
 Social login options
 
-# Dashboard
+### Dashboard
 Financial overview widgets
 
 Spending analytics charts
@@ -36,7 +36,7 @@ Recent transactions list
 
 Interactive period filters
 
-# Transaction Management
+### Transaction Management
 Filter transactions by date, type, category, status
 
 Search functionality
@@ -45,7 +45,7 @@ Transaction status badges
 
 Pagination controls
 
-# Budgeting
+### Budgeting
 Budget vs actual tracking
 
 Spending breakdown charts
@@ -54,7 +54,7 @@ Category-wise budget progress
 
 AI optimization suggestions
 
-# Investment Hub
+### Investment Hub
 Portfolio performance tracking
 
 Asset allocation visualization
@@ -63,7 +63,7 @@ Real holdings table
 
 AI investment recommendations
 
-# Savings Hub
+### Savings Hub
 Savings goals tracking
 
 Progress bars with color coding
@@ -72,7 +72,7 @@ Account management
 
 AI savings tips
 
-# Settings
+### Settings
 Account management
 
 Security preferences
